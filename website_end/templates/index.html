@@ -1,0 +1,9 @@
+{% include 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+{% block content %}
+    <div class="container col-lg-3 vh-100 d-flex align-items-center bg-body-tertiary">
+        <div class="form-signin w-100">
+            {{ render_form(form) }}
+        </div>
+    </div>
+{% endblock %}
