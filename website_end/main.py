@@ -1,5 +1,5 @@
 import secrets
-from flask import Flask, render_template, redirect, url_for, request, jsonify, session, g
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField, PasswordField
@@ -17,8 +17,6 @@ from models import *
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 bootstrap = Bootstrap5(app)
-
-CORS(app)
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chat.db"
@@ -41,6 +39,9 @@ gravatar = Gravatar(app,
                     use_ssl=False,
                     base_url=None)
 
+
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -122,13 +123,14 @@ def handle_message(data):
     new_message = data['message']
     message = Message(
         user=current_user,
-        text=new_message
+        text=new_message,
     )
     db.session.add(message)
     db.session.commit()
     emit('message', jsonify({'data': render_template('message.html',
                                                      message=message,
-                                                     current_user=current_user),
+                                                     current_user=current_user,
+                                                     room=room),
                              'username_of_sender': data['username']}).json,
          to=room)
 
