@@ -43,12 +43,10 @@ gravatar = Gravatar(app,
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.get_or_404(User, user_id)
-
-
-
 
 
 with app.app_context():
@@ -112,8 +110,6 @@ def connect(auth):
         return redirect(url_for('home'))
     else:
         join_room(room)
-        send({"name": name, "message": "has entered the room"}, to=room)
-        print(f"{name} has joined the {room}")
         return redirect(url_for('chat'))
 
 
