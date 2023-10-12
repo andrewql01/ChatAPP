@@ -14,23 +14,7 @@
                 <div class="card">
                     <div class="card-body">
 
-                        <ul class="list-unstyled mb-0">
-                            <li class="p-2 border-bottom" style="background-color: #eee;">
-                                <a href="#!" class="d-flex justify-content-between">
-                                    <div class="d-flex flex-row">
-                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-8.webp" alt="avatar"
-                                             class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="60">
-                                        <div class="pt-1">
-                                            <p class="fw-bold mb-0">John Doe</p>
-                                            <p class="small text-muted">Hello, Are you there?</p>
-                                        </div>
-                                    </div>
-                                    <div class="pt-1">
-                                        <p class="small text-muted mb-1">Just now</p>
-                                        <span class="badge bg-danger float-end">1</span>
-                                    </div>
-                                </a>
-                            </li>
+                        <ul class="list-unstyled mb-0" id="room-list">
                         </ul>
 
                     </div>
@@ -90,12 +74,24 @@
     let socket = io.connect('http://127.0.0.1:5000/');
     let username = $('#username-data').data();
     let room = $('#room-data').data();
-    let form = $('form').on('submit', function(e){
+    $('form').on('submit', function(e){
         socket.emit('message',
             data = {'message': $('.form-control').val(),
                     'username': username,
                     'room': room});
         e.preventDefault();
+    });
+    socket.on('refresh_rooms', function(response){
+        $('#room-list').prepend(response['site_data']);
+        $('.btn-change-room').each(function(i, obj){
+            $(obj).on('click', function(e){
+                console.log($(obj).attr('name'))
+                socket.emit('change_room',
+                    data = {'room': $(obj).attr('name')});
+                e.preventDefault();
+            });
+        });
+
     });
     socket.on('message', function(response){
         let html_content = response['data'].split('<hr>');
@@ -109,6 +105,11 @@
         $('#current-chat').prepend(message_content);
         $('.form-control').val('');
     });
+    socket.on('fetch_messages', function(response){
+        let html_content = response['data'];
+        $('#current-chat').replaceWith(html_content);
+        $('.form-control').val('');
+    })
 </script>
 <script type="text/javascript">
 

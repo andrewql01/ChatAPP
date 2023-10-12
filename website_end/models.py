@@ -35,3 +35,5 @@ class Room(db.Model):
     name = db.Column(db.String(250), unique=True, nullable=False)
     messages = relationship('Message', back_populates='room')
     users = relationship('User', secondary=room_tag, back_populates='rooms')
+
+
